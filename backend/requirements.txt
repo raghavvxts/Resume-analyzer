@@ -1,0 +1,7 @@
+flask
+flask-cors
+PyPDF2
+scikit-learn
+google-genai
+python-dotenv
+gunicorn
