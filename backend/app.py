@@ -562,9 +562,13 @@ def analyze():
             "ai_recommendations": ai_payload,
             "suggestions": suggestions,
         })
-    except PyPDF2.errors.PdfReadError:
+    except (PyPDF2.errors.PdfReadError, PyPDF2.errors.FileNotDecryptedError):
         return jsonify({"error": "Invalid or corrupted PDF file."}), 400
-    except Exception:
+    except Exception as exc:
+        app.logger.exception("Analyze endpoint failed")
+        debug_enabled = os.getenv("FLASK_DEBUG", "false").lower() == "true"
+        if debug_enabled:
+            return jsonify({"error": f"Analysis failed: {exc}"}), 500
         return jsonify({"error": "Analysis failed due to an internal error."}), 500
 
 
