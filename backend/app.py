@@ -96,7 +96,7 @@ def calculate_similarity(resume, job_desc):
         score = cosine_similarity(tfidf)[0][1]
     except ValueError:
         return 0.0
-    return round(score * 100, 2)
+    return float(round(float(score) * 100, 2))
 
 # Keyword extraction
 def extract_keyword_tokens(text):
@@ -248,19 +248,19 @@ def build_bullet_templates(missing_keywords, role_level, years_experience):
 def build_checklist(score, keyword_coverage, section_scores, missing_keywords, resume_text):
     has_summary = bool(re.search(r"\b(summary|objective)\b", resume_text.lower()))
     has_metrics = bool(re.search(r"\b\d+%\b|\b\d+\s*(ms|sec|seconds|hours|days|x)\b", resume_text.lower()))
-    experience_score = section_scores.get("experience", 0)
+    experience_score = float(section_scores.get("experience", 0))
 
     items = [
         {
             "id": "score",
             "label": "Resume score is at least 70",
-            "completed": score >= 70,
+            "completed": bool(score >= 70),
             "reason": f"Current score: {score}%",
         },
         {
             "id": "coverage",
             "label": "Keyword coverage is at least 45%",
-            "completed": keyword_coverage >= 45,
+            "completed": bool(keyword_coverage >= 45),
             "reason": f"Current coverage: {keyword_coverage}%",
         },
         {
@@ -278,19 +278,19 @@ def build_checklist(score, keyword_coverage, section_scores, missing_keywords, r
         {
             "id": "experience",
             "label": "Experience section is aligned with job terms",
-            "completed": experience_score >= 30,
+            "completed": bool(experience_score >= 30),
             "reason": f"Experience alignment: {experience_score}%",
         },
         {
             "id": "gaps",
             "label": "High-priority keyword gaps are below 8",
-            "completed": len(missing_keywords) < 8,
+            "completed": bool(len(missing_keywords) < 8),
             "reason": f"Current high-priority gaps: {len(missing_keywords)}",
         },
     ]
 
     completed_count = len([item for item in items if item["completed"]])
-    completion_percent = round((completed_count / len(items)) * 100, 2)
+    completion_percent = float(round((completed_count / len(items)) * 100, 2))
     return {
         "completion_percent": completion_percent,
         "items": items,
